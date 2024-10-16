@@ -114,8 +114,6 @@ exports.verifyDBEmail = async (req, res) => {
 };
 
 const sendVerificationEmail = async (email, accessUrl, emailType) => {
-
-
     try {
         const transporter = nodemailer.createTransport({
             host: 'smtp.ethereal.email',
@@ -125,7 +123,6 @@ const sendVerificationEmail = async (email, accessUrl, emailType) => {
                 pass: process.env.NODEMAILER_PASSWORD
             }
         });
-        // console.log("🚀 ~ sendVerificationEmail ~ transporter:", transporter)
 
         let subject = '';
         let message = '';
@@ -151,7 +148,7 @@ const sendVerificationEmail = async (email, accessUrl, emailType) => {
         const av = await transporter.sendMail(mailOptions);
         //    console.log("🚀 ~ sendVerificationEmail ~ av:", av.response)
 
-        // console.log('Verification email sent');
+        return 'Email sent';
     } catch (error) {
 
         console.error('Error sending email', error);
@@ -245,14 +242,14 @@ exports.verifyEmailPassword = async (req, res) => {
         }
 
         // Generate a verification token (expires in 1 hour)
-        const token = jwt.sign({ email, newPassword }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         // Send verification email
         const resetPassUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
         await sendVerificationEmail(email, resetPassUrl, 'updatePassword');
 
-        res.status(200).json({ message: 'Verification email sent. Please check your inbox' });
+        res.status(200).json({ message: 'Password reset email sent please check your inbox' });
     } catch (error) {
         res.status(500).json({ message: 'Error sending verification email', error });
     }
@@ -262,10 +259,12 @@ exports.verifyEmailPassword = async (req, res) => {
 exports.verifyUpdatePassword = async (req, res) => {
     try {
         const { token } = req.query;
+        const { newPassword } = req.body;
 
         // Verify the token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const { email, newPassword } = decoded;
+
+        const { email } = decoded;
 
         // Find user by email
         const user = await User.findOne({ email });
@@ -279,9 +278,9 @@ exports.verifyUpdatePassword = async (req, res) => {
 
         await user.save();
 
-        res.status(200).json({ message: 'Password updated successfully!' });
+        return res.status(200).json({ message: 'Password updated successfully!' });
     } catch (error) {
-        res.status(500).json({ message: 'Error updating password', error });
+        return res.status(500).json({ message: 'Error updating password', error });
     }
 };
 

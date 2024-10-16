@@ -9,11 +9,8 @@ router.get('/verify-email',verifyEmail)
 // console.log(req.query)
 // })
 router.post('/send-verification-email',verifyDBEmail)
-router.post('/reset-password', verifyEmailPassword);
+router.post('/send-reset-password-email', verifyEmailPassword);
 router.post('/login',loginUser)
-// router.get('/users/verify-update-password', verifyUpdatePassword);
-// router.get('/users/verify-email', verifyEmail);
-// router.put('/update-emailPassword', verifyEmailPass);
-// router.put('/reset-password',verifyUpdatePassword)
+router.put('/reset-password',verifyUpdatePassword)
 
 module.exports = router;
