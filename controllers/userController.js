@@ -18,7 +18,7 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: error.details[0].message });
 
     const existingUser = await User.findOne({ email });
-    if (existingUser) {
+    if (existingUser?.isVerified) {
       return res.status(400).json({ message: "User already exists" });
     }
 
@@ -39,7 +39,7 @@ exports.register = async (req, res) => {
       .status(201)
       .json({ message: "User created! Please verify your email." });
   } catch (error) {
-    return res.status(500).json({ message: "Error creating user", error });
+    return res.status(500).json({ message: error.message });
   }
 };
 
